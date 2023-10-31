@@ -57,7 +57,8 @@ player.events.on('audioTrackAdd', (queue, track) => {
     })
     .setColor('#e6cc00')
 
-  queue.metadata.channel.send({ embeds: [embed] })
+  if (queue.tracks.length > 0) {
+    queue.metadata.channel.send({ embeds: [embed] })
 })
 
 client.on('trackEnd', (guildId = 0) => {
