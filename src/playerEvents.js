@@ -22,10 +22,6 @@ player.events.on('playerStart', (queue, track) => {
       name: player.client.user.tag,
       iconURL: player.client.user.displayAvatarURL(),
     })
-    .setTitle({
-      text: '🎶 | Đang phát nhạc',
-      url: track.url,
-    })
     .addFields({
       name: `${track.title}`,
       value: `0:00 ┃ 🔘▬▬▬▬▬▬▬▬▬▬▬▬▬▬ ┃ ${track.duration}`,
@@ -51,14 +47,25 @@ player.events.on('playerSkip', (queue, track) => {
 player.events.on('audioTrackAdd', (queue, track) => {
   const embed = new EmbedBuilder()
     .setThumbnail(track.thumbnail)
-    .addFields({
-      name: `Bài hát ${track.title} đã được thêm vào hàng đợi ✅`,
-      value: `${track.title} \`(${track.duration})\``,
-    })
+    .addFields(
+      {
+        name: 'Đã thêm vào hàng đợi ✅',
+        value: `${track.title}`,
+      },
+      {
+        name: 'Thời lượng',
+        value: track.duration,
+        inline: true,
+      },
+      {
+        name: 'Yêu cầu bởi',
+        value: track.requestedBy.tag,
+        inline: true,
+      }
+    )
     .setColor('#e6cc00')
 
-  if (queue.tracks.length > 0) {
-    queue.metadata.channel.send({ embeds: [embed] })
+  queue.metadata.channel.send({ embeds: [embed] })
 })
 
 client.on('trackEnd', (guildId = 0) => {
@@ -92,10 +99,22 @@ player.events.on('audioTracksAdd', (queue, tracks) => {
     .setThumbnail(
       tracks[0].playlist.thumbnail.url ?? tracks[0].playlist.thumbnail
     )
-    .addFields({
-      name: 'Đã thêm danh sách phát vào hàng đợi ✅',
-      value: `${tracks.length} bài hát`,
-    })
+    .addFields(
+      {
+        name: 'Đã thêm vào hàng đợi ✅',
+        value: `${tracks.length} bài hát`,
+      },
+      {
+        name: 'Thời lượng',
+        value: tracks[0].playlist.duration,
+        inline: true,
+      },
+      {
+        name: 'Yêu cầu bởi',
+        value: tracks[0].playlist.requestedBy.tag,
+        inline: true,
+      }
+    )
     .setColor('#e6cc00')
 
   queue.metadata.channel.send({ embeds: [embed] })
