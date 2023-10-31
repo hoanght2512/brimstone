@@ -16,6 +16,11 @@ module.exports = {
         quality: 'highestaudio',
         highWaterMark: 1 << 25,
       },
+      requestOptions: {
+        headers: {
+          cookie: process.env.YT_COOKIE || '',
+        },
+      },
     },
     maxNumberOfChoices: 10, // Maximum autocomplete choices, shouldn't be more than 25
   },

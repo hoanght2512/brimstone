@@ -9,8 +9,8 @@ global.client = new Client({
     GatewayIntentBits.GuildMembers,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.GuildVoiceStates,
-    GatewayIntentBits.MessageContent
-  ]
+    GatewayIntentBits.MessageContent,
+  ],
 })
 
 client.config = require('./config')
@@ -24,4 +24,4 @@ global.player = player
 require('./src/playerEvents')
 require('./src/loader')
 
-client.login(client.token)
+client.login(process.env.DISCORD_BOT_TOKEN)

@@ -18,14 +18,23 @@ player.events.on('playerStart', (queue, track) => {
   const embed = new EmbedBuilder()
     .setURL(track.url)
     .setThumbnail(track.thumbnail)
-    .setTitle(`${track.title}`)
-    .addFields(
-      {
-        name: `Đang phát trong ${queue.channel.name} 🎧`,
-        value: `Thêm bởi ${track.requestedBy}`,
-      },
-      { name: 'Thời gian', value: `\`(${track.duration})\`` }
-    )
+    .setAuthor({
+      name: player.client.user.tag,
+      iconURL: player.client.user.displayAvatarURL(),
+    })
+    .setTitle({
+      text: '🎶 | Đang phát nhạc',
+      url: track.url,
+    })
+    .addFields({
+      name: `${track.title}`,
+      value: `0:00 ┃ 🔘▬▬▬▬▬▬▬▬▬▬▬▬▬▬ ┃ ${track.duration}`,
+      inline: true,
+    })
+    .setFooter({
+      text: `Yêu cầu bởi ${track.requestedBy.tag}`,
+      iconURL: track.requestedBy.displayAvatarURL(),
+    })
     .setColor('#13f857')
 
   queue.metadata.channel
