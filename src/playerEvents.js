@@ -43,7 +43,7 @@ player.events.on('audioTrackAdd', (queue, track) => {
   const embed = new EmbedBuilder()
     .setThumbnail(track.thumbnail)
     .addFields({
-      name: 'Bài hát ${track.title} đã được thêm vào hàng đợi ✅',
+      name: `Bài hát ${track.title} đã được thêm vào hàng đợi ✅`,
       value: `${track.title} \`(${track.duration})\``,
     })
     .setColor('#e6cc00')
