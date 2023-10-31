@@ -3,75 +3,80 @@ const { ApplicationCommandOptionType } = require('discord.js')
 const MAX_NUMBER_OF_CHOICES = client.config.opt.maxNumberOfChoices
 
 module.exports = {
-    name : 'play',
-    description : 'Play a song of your choice!',
-    voiceChannel : true,
-    options : [
-        {
-            name : 'song',
-            description: 'name of song to play',
-            type : ApplicationCommandOptionType.String,
-            required : true,
-            autocomplete : true
-        }
-    ],
-
-    async autocomplete({ interaction }) {
-        const query = interaction.options.getString('song', true)
-        if(!query) return
-        
-        const results = await player.search(query)
-
-        return interaction.respond(
-            results.tracks?.slice(0, MAX_NUMBER_OF_CHOICES).map((t) => ({
-                name: (`(${t.duration}) - ${t.title}`).slice(0,100),
-                value: t.url
-            }))
-        )
+  name: 'play',
+  description: 'Phát nhạc từ youtube',
+  voiceChannel: true,
+  options: [
+    {
+      name: 'song',
+      description: 'Tên bài hát hoặc link youtube',
+      type: ApplicationCommandOptionType.String,
+      required: true,
+      autocomplete: true,
     },
+  ],
 
-    async execute ({ interaction }) {
-        await interaction.deferReply()
-        
-        const songName = interaction.options.getString('song')
+  async autocomplete({ interaction }) {
+    const query = interaction.options.getString('song', true)
+    if (!query) return
 
-        const result = await player.search(songName, {
-            requestedBy: interaction.member,
-            searchEngine: QueryType.AUTO
-        })
-        .catch(error => console.log(error))
+    const results = await player.search(query)
 
-        if (!result || !result.tracks.length) return client.error.NO_RESULTS_FOUND(interaction)
+    return interaction.respond(
+      results.tracks?.slice(0, MAX_NUMBER_OF_CHOICES).map((t) => ({
+        name: `(${t.duration}) - ${t.title}`.slice(0, 100),
+        value: t.url,
+      }))
+    )
+  },
 
-        const queue = await player.nodes.create(interaction.guild, {
-            metadata: {
-                channel: interaction.channel,
-                client: interaction.guild.members.me,
-                requestedBy: interaction.user,
-            },
-            selfDeaf: true,
-            volume: client.config.opt.defaultvolume,
-            leaveOnEnd: client.config.opt.leaveOnEnd,
-            leaveOnEndCooldown: client.config.opt.leaveOnEndCooldown,
-            leaveOnStop: client.config.opt.leaveOnStop,
-            leaveOnEmpty: client.config.opt.leaveOnEmpty,
-            leaveOnEmptyCooldown: client.config.opt.leaveOnEmptyCooldown
-        });
+  async execute({ interaction }) {
+    await interaction.deferReply()
 
-        try {
-            if (!queue.connection) await queue.connect(interaction.member.voice.channel)
-        } catch {
-            player.deleteQueue(interaction.guildId);
-            return client.error.CONNECTION_FAIL(interaction)
-        }
+    const songName = interaction.options.getString('song')
 
-        await interaction.followUp({
-            content: `⏱| Loading your ${result.playlist ? "playlist" : "track"}`,
-            ephemeral: true
-        }).then(async (message) => {
-            queue.addTrack(result.playlist ? result.tracks : result.tracks[0])
-            if (!queue.node.isPlaying()) await queue.node.play()
-            message.delete()
-        });
+    const result = await player
+      .search(songName, {
+        requestedBy: interaction.member,
+        searchEngine: QueryType.AUTO,
+      })
+      .catch((error) => console.log(error))
+
+    if (!result || !result.tracks.length)
+      return client.error.NO_RESULTS_FOUND(interaction)
+
+    const queue = await player.nodes.create(interaction.guild, {
+      metadata: {
+        channel: interaction.channel,
+        client: interaction.guild.members.me,
+        requestedBy: interaction.user,
+      },
+      selfDeaf: true,
+      volume: client.config.opt.defaultvolume,
+      leaveOnEnd: client.config.opt.leaveOnEnd,
+      leaveOnEndCooldown: client.config.opt.leaveOnEndCooldown,
+      leaveOnStop: client.config.opt.leaveOnStop,
+      leaveOnEmpty: client.config.opt.leaveOnEmpty,
+      leaveOnEmptyCooldown: client.config.opt.leaveOnEmptyCooldown,
+    })
+
+    try {
+      if (!queue.connection)
+        await queue.connect(interaction.member.voice.channel)
+    } catch {
+      player.deleteQueue(interaction.guildId)
+      return client.error.CONNECTION_FAIL(interaction)
     }
+
+    await interaction
+      .followUp({
+        content: `⏱| Đang tải ${result.playlist ? 'danh sách' : 'bài hát'}...`,
+        ephemeral: true,
+      })
+      .then(async (message) => {
+        queue.addTrack(result.playlist ? result.tracks : result.tracks[0])
+        if (!queue.node.isPlaying()) await queue.node.play()
+        message.delete()
+      })
+  },
 }
