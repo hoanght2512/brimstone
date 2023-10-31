@@ -1,0 +1,25 @@
+{
+  "name": "discord-music-bot",
+  "version": "1.1.0",
+  "description": "Discord Bot for playing music from selected playlist",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "author": "ervin-sungkono",
+  "license": "ISC",
+  "dependencies": {
+    "@devraelfreeze/discordjs-pagination": "^2.6.8",
+    "@discord-player/extractor": "^4.1.1",
+    "discord-player": "^6.1.0",
+    "discord.js": "^14.8.0",
+    "dotenv": "^16.0.3",
+    "ffmpeg-static": "^5.2.0",
+    "opusscript": "^0.0.8",
+    "play-dl": "^1.9.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
